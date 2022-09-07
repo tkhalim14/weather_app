@@ -108,7 +108,7 @@ class LocationScreen extends StatelessWidget {
                           onPressed: () {
                             controller.getWeatherData();
                           },
-                          child: const Icon(
+                          child: Icon(
                             Icons.near_me,
                             size: 35.0,
                           ),
@@ -143,6 +143,16 @@ class LocationScreen extends StatelessWidget {
                               ),
                             ],
                           ),
+                          SizedBox(
+                            height: 40,
+                          ),
+                          Text(
+                            "Feels like",
+                          ),
+                          Text(
+                            "${data.main.feelsLike.toInt().toString()}°C",
+                            style: kFeelsTextStyle,
+                          )
                         ],
                       ),
                     ),
