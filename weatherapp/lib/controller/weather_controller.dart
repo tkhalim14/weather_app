@@ -7,6 +7,7 @@ class WeatherController extends GetxController {
   final weatherService = Get.put(WeatherService());
 
   Future<Weather> getWeatherData() async {
+    // ignore: prefer_typing_uninitialized_variables
     var res;
     try {
       res = await weatherService.getWeather();
