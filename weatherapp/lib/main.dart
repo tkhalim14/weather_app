@@ -152,7 +152,7 @@ class _LocationScreenState extends State<LocationScreen> {
           } else if (snapshot.hasData) {
             var data = snapshot.data;
             // var weatherIcon = weatherStatus.getWeatherIcon(data!.cod);
-            temp = data!.main.temp.toInt();
+            temp = data?.main.temp.toInt() ?? 0;
             //print(data.name);
             //var t = timeObj._timeString;
             //dd-MM-yyyy \n kk:mm
@@ -192,8 +192,7 @@ class _LocationScreenState extends State<LocationScreen> {
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 15.0),
+                    Container(
                       child: Column(
                         children: [
                           Text(
@@ -221,11 +220,12 @@ class _LocationScreenState extends State<LocationScreen> {
                                     style: TextStyle(fontSize: 12),
                                   ),
                                   Text(
-                                    "${data.main.feelsLike.toInt().toString()}°C",
+                                    "${data?.main.feelsLike.toInt().toString()}°C",
                                     style: kFeelsTextStyle,
                                   ),
                                   Text(
-                                    weatherStatus.getWeatherIcon(data.cod!),
+                                    weatherStatus
+                                        .getWeatherIcon(data?.cod ?? 0),
                                     style: kConditionTextStyle,
                                   ),
                                 ],
@@ -239,7 +239,7 @@ class _LocationScreenState extends State<LocationScreen> {
                             "Seems like there's",
                           ),
                           Text(
-                            "${data.weather[0].description.toString()}",
+                            "${data?.weather[0].description.toString()}",
                             style: kFeelsTextStyle,
                           )
                         ],
