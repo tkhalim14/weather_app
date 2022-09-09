@@ -6,10 +6,10 @@ import 'package:weatherapp/models/model.dart';
 import 'package:weatherapp/util/constants.dart';
 import 'package:weatherapp/util/weatherstatus.dart';
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'My Weather App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -31,47 +31,97 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class TimeData extends StatefulWidget {
-  TimeData({Key? key}) : super(key: key);
+const ScreenImage = {
+  'default': 'images/location_background.jpg',
+  'sunrise': 'images/sunrise_time.jpg',
+  'morning': 'images/morning_time.jpg',
+  'day': 'images/sunny_time.jpg',
+  'rainy': 'images/rainy_time.jpeg',
+  'sunset': 'images/sunset_time.jpg',
+  'winter': 'images/winter_time.jpg',
+  'night': 'images/night_time.jpg',
+};
 
+class LocationScreen extends StatefulWidget {
   @override
-  State<TimeData> createState() => _TimeDataState();
+  State<LocationScreen> createState() => _LocationScreenState();
 }
 
-class _TimeDataState extends State<TimeData> {
+class _LocationScreenState extends State<LocationScreen> {
+  final controller = Get.put(WeatherController());
+
+  final weatherStatus = Get.put(WeatherStatus());
+
+  late int temp = 0;
+
   void _getTime() {
     final String formattedDateTime =
         DateFormat('dd-MM-yyyy \n kk:mm').format(DateTime.now()).toString();
+    AssetImage decideBackground(var hour, var temp) {
+      int h = int.parse(hour);
+      if (h > 18 || (h >= 0 && h < 5)) {
+        keyval = 'night';
+      } else if (h == 18) {
+        keyval = 'sunset';
+      } else if (h < 18 && h >= 12) {
+        keyval = 'day';
+      } else if (h >= 0 && h < 5) {
+        keyval = 'night';
+      } else if (h == 5) {
+        keyval = 'sunrise';
+      } else if (h > 5 && h <= 11) {
+        keyval = 'morning';
+      }
+      late String img_location = ScreenImage[keyval].toString();
+      //print(hour);
+      return AssetImage(img_location);
+    }
+
     setState(() {
       _timeString = formattedDateTime;
+      hour = getHour(_timeString);
+      background = decideBackground(hour, temp);
+      print(background);
     });
   }
 
-  late String _timeString;
+  String keyval = 'default';
+  late AssetImage background = AssetImage(ScreenImage['default'].toString());
+
+  String getHour(var t) {
+    bool flag = false;
+    bool flag1 = false;
+    int i = 0;
+    var hour = "";
+    //var minute = "";
+    for (i = 0; i < t.length; i++) {
+      if (t[i] == '\n') {
+        flag = true;
+      }
+      if (flag) {
+        if (t[i] == ':') {
+          flag1 = !flag1;
+        }
+        if (!flag1) {
+          if (t[i] != ' ') hour += t[i];
+        } else {
+          // if (t[i] != ':') minute += t[i];
+        }
+      }
+    }
+    return hour;
+  }
+
+  late String _timeString =
+      DateFormat('dd-MM-yyyy \n kk:mm').format(DateTime.now()).toString();
+  late String hour = '00';
 
   @override
   void initState() {
     super.initState();
-    Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+    Timer.periodic(Duration(seconds: 1), (Timer t) => {_getTime()});
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      '${_timeString}',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 40,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-}
-
-class LocationScreen extends StatelessWidget {
-  final controller = Get.put(WeatherController());
-
-  final weatherStatus = Get.put(WeatherStatus());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,11 +135,14 @@ class LocationScreen extends StatelessWidget {
           } else if (snapshot.hasData) {
             var data = snapshot.data;
             var weatherIcon = weatherStatus.getWeatherIcon(data!.cod);
-
+            temp = data.main.temp.toInt();
+            //var t = timeObj._timeString;
+            //dd-MM-yyyy \n kk:mm
+            //print(minute);
             return Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: const AssetImage('images/location_background.jpg'),
+                  image: background,
                   fit: BoxFit.cover,
                   colorFilter:
                       ColorFilter.mode(Colors.white, BlendMode.dstATop),
@@ -109,7 +162,7 @@ class LocationScreen extends StatelessWidget {
                             controller.getWeatherData();
                           },
                           child: Icon(
-                            Icons.near_me,
+                            Icons.cached,
                             size: 35.0,
                           ),
                         ),
@@ -126,7 +179,14 @@ class LocationScreen extends StatelessWidget {
                       padding: EdgeInsets.only(left: 15.0),
                       child: Column(
                         children: [
-                          TimeData(),
+                          Text(
+                            '${_timeString}',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           SizedBox(
                             height: 50,
                           ),
@@ -134,23 +194,35 @@ class LocationScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Text(
-                                "${data.main.temp.toInt().toString()}°C",
+                                "${temp.toString()}°C",
                                 style: kTempTextStyle,
                               ),
-                              Text(
-                                weatherStatus.getWeatherIcon(data.cod),
-                                style: kConditionTextStyle,
+                              Column(
+                                children: [
+                                  Text(
+                                    "Feels like",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  Text(
+                                    "${data.main.feelsLike.toInt().toString()}°C",
+                                    style: kFeelsTextStyle,
+                                  ),
+                                  Text(
+                                    weatherStatus.getWeatherIcon(data.cod),
+                                    style: kConditionTextStyle,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                           SizedBox(
-                            height: 40,
+                            height: 20,
                           ),
                           Text(
-                            "Feels like",
+                            "Seems like there's",
                           ),
                           Text(
-                            "${data.main.feelsLike.toInt().toString()}°C",
+                            "${data.weather[0].description.toString()}",
                             style: kFeelsTextStyle,
                           )
                         ],
@@ -162,7 +234,7 @@ class LocationScreen extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 15.0),
                         child: Text(
-                          "${weatherStatus.getMessage(data.main.temp.toInt())} in ${data.name}!",
+                          "${weatherStatus.getMessage(temp)} in ${data.name}!",
                           textAlign: TextAlign.center,
                           style: kMessageTextStyle,
                         ),
