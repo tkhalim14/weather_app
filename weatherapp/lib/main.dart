@@ -7,6 +7,7 @@ import 'package:weatherapp/util/constants.dart';
 import 'package:weatherapp/util/weatherstatus.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My Weather App',
+      title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-const ScreenImage = {
+const screenImage = {
   'default': 'images/location_background.jpg',
   'sunrise': 'images/sunrise_time.jpg',
   'morning': 'images/morning_time.jpg',
@@ -54,39 +55,40 @@ class _LocationScreenState extends State<LocationScreen> {
 
   late int temp = 0;
 
+  AssetImage decideBackground(var hour, var temp) {
+    int h = int.parse(hour);
+    if (h > 18 || (h >= 0 && h < 5)) {
+      keyval = 'night';
+    } else if (h == 18) {
+      keyval = 'sunset';
+    } else if (h < 18 && h >= 12) {
+      keyval = 'day';
+    } else if (h >= 0 && h < 5) {
+      keyval = 'night';
+    } else if (h == 5) {
+      keyval = 'sunrise';
+    } else if (h > 5 && h <= 11) {
+      keyval = 'morning';
+    }
+    late String img_location = screenImage[keyval].toString();
+    //print(hour);
+    return AssetImage(img_location);
+  }
+
   void _getTime() {
     final String formattedDateTime =
         DateFormat('dd-MM-yyyy \n kk:mm').format(DateTime.now()).toString();
-    AssetImage decideBackground(var hour, var temp) {
-      int h = int.parse(hour);
-      if (h > 18 || (h >= 0 && h < 5)) {
-        keyval = 'night';
-      } else if (h == 18) {
-        keyval = 'sunset';
-      } else if (h < 18 && h >= 12) {
-        keyval = 'day';
-      } else if (h >= 0 && h < 5) {
-        keyval = 'night';
-      } else if (h == 5) {
-        keyval = 'sunrise';
-      } else if (h > 5 && h <= 11) {
-        keyval = 'morning';
-      }
-      late String img_location = ScreenImage[keyval].toString();
-      //print(hour);
-      return AssetImage(img_location);
-    }
 
     setState(() {
       _timeString = formattedDateTime;
       hour = getHour(_timeString);
       background = decideBackground(hour, temp);
-      print(background);
+      // print(background);
     });
   }
 
   String keyval = 'default';
-  late AssetImage background = AssetImage(ScreenImage['default'].toString());
+  late AssetImage background = decideBackground(hour, temp);
 
   String getHour(var t) {
     bool flag = false;
@@ -119,7 +121,22 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     Timer.periodic(Duration(seconds: 1), (Timer t) => {_getTime()});
+  }
+
+  @override
+  dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
   }
 
   @override
@@ -130,15 +147,15 @@ class _LocationScreenState extends State<LocationScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-              child: Text("${snapshot.error.toString()}"),
+              child: Text(snapshot.error.toString()),
             );
           } else if (snapshot.hasData) {
             var data = snapshot.data;
-            var weatherIcon = weatherStatus.getWeatherIcon(data!.cod);
-            temp = data.main.temp.toInt();
+            // var weatherIcon = weatherStatus.getWeatherIcon(data!.cod);
+            temp = data!.main.temp.toInt();
+            //print(data.name);
             //var t = timeObj._timeString;
             //dd-MM-yyyy \n kk:mm
-            //print(minute);
             return Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
@@ -208,7 +225,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                     style: kFeelsTextStyle,
                                   ),
                                   Text(
-                                    weatherStatus.getWeatherIcon(data.cod),
+                                    weatherStatus.getWeatherIcon(data.cod!),
                                     style: kConditionTextStyle,
                                   ),
                                 ],
@@ -234,7 +251,7 @@ class _LocationScreenState extends State<LocationScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 15.0),
                         child: Text(
-                          "${weatherStatus.getMessage(temp)} in ${data.name}!",
+                          "${weatherStatus.getMessage(temp)}",
                           textAlign: TextAlign.center,
                           style: kMessageTextStyle,
                         ),

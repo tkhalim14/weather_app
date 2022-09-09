@@ -32,7 +32,7 @@ class BaseService {
 }
 
 handleError(DioError error) {
-  print(error.response.toString());
+  //print(error.response.toString());
   if (error.message.contains('SocketException')) {
     return 'Cannot connect. Check that you have internet connection';
   }

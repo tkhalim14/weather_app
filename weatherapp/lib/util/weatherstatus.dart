@@ -23,11 +23,13 @@ class WeatherStatus {
     if (temp > 25) {
       return 'It\'s 🍦 time';
     } else if (temp > 20) {
-      return 'SummerTime 😎\n';
-    } else if (temp < 10) {
-      return 'It\'s too damn chilly.\n🧣 and 🧤\n';
+      return 'SummerTime 😎';
+    } else if (temp <= 20 && temp > 10) {
+      return 'Maybe consider\n wearing a jacket';
+    } else if (temp <= 10) {
+      return 'It\'s too damn chilly.\n🧣 & 🧤 time';
     } else {
-      return 'Bring a 🧥 just in case\n';
+      return 'Bring a 🧥 just in case';
     }
   }
 }

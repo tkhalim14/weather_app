@@ -16,7 +16,7 @@ class WeatherService {
       Response response = await service.request(
           "https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey&units=metric",
           method: "Get");
-      print("_++++++++++++++++++${response.statusCode}");
+      // print("_++++++++++++++++++${response.statusCode}");
       return response;
     } on DioError catch (e) {
       throw handleError(e);

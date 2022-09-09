@@ -29,15 +29,15 @@ class Weather {
   List<WeatherElement> weather;
   String base;
   Main main;
-  int visibility;
+  int? visibility;
   Wind wind;
   Clouds clouds;
-  int dt;
+  int? dt;
   Sys sys;
-  int timezone;
-  int id;
+  int? timezone;
+  int? id;
   String name;
-  int cod;
+  int? cod;
 
   factory Weather.fromJson(Map<String, dynamic> json) => Weather(
         coord: Coord.fromJson(json["coord"]),
@@ -78,7 +78,7 @@ class Clouds {
     required this.all,
   });
 
-  int all;
+  int? all;
 
   factory Clouds.fromJson(Map<String, dynamic> json) => Clouds(
         all: json["all"],
@@ -123,8 +123,8 @@ class Main {
   double feelsLike;
   double tempMin;
   double tempMax;
-  int pressure;
-  int humidity;
+  int? pressure;
+  int? humidity;
 
   factory Main.fromJson(Map<String, dynamic> json) => Main(
         temp: json["temp"].toDouble(),
@@ -154,11 +154,11 @@ class Sys {
     required this.sunset,
   });
 
-  int type;
-  int id;
+  int? type;
+  int? id;
   String country;
-  int sunrise;
-  int sunset;
+  int? sunrise;
+  int? sunset;
 
   factory Sys.fromJson(Map<String, dynamic> json) => Sys(
         type: json["type"],
@@ -185,7 +185,7 @@ class WeatherElement {
     required this.icon,
   });
 
-  int id;
+  int? id;
   String main;
   String description;
   String icon;
@@ -212,7 +212,7 @@ class Wind {
   });
 
   double speed;
-  int deg;
+  int? deg;
 
   factory Wind.fromJson(Map<String, dynamic> json) => Wind(
         speed: json["speed"].toDouble(),
