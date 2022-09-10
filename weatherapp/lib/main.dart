@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
@@ -23,7 +25,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'My Weather App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.red,
+        primaryIconTheme: const IconThemeData(
+          color: Colors.red,
+        ),
       ),
       darkTheme: ThemeData.dark(),
       debugShowCheckedModeBanner: false,
@@ -174,15 +179,7 @@ class _LocationScreenState extends State<LocationScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            controller.getWeatherData();
-                          },
-                          child: Icon(
-                            Icons.cached,
-                            size: 35.0,
-                          ),
-                        ),
+                        RotateIcon(),
                         TextButton(
                           onPressed: () {},
                           child: const Icon(
@@ -192,58 +189,87 @@ class _LocationScreenState extends State<LocationScreen> {
                         ),
                       ],
                     ),
-                    Container(
-                      child: Column(
-                        children: [
-                          Text(
-                            '${_timeString}',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold,
+                    Column(
+                      children: [
+                        Text(
+                          '${_timeString.split('\n')[1].split(' ')[1]}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 70,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '${_timeString.split('\n')[0]}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 80,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'Location',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "${data?.name}",
+                                      style: kFeelsTextStyle,
+                                    )
+                                  ],
+                                ),
+                                Text(
+                                  "${temp.toString()}°C",
+                                  style: kTempTextStyle,
+                                ),
+                              ],
                             ),
-                          ),
-                          SizedBox(
-                            height: 50,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                "${temp.toString()}°C",
-                                style: kTempTextStyle,
-                              ),
-                              Column(
-                                children: [
-                                  Text(
-                                    "Feels like",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    "${data?.main.feelsLike.toInt().toString()}°C",
-                                    style: kFeelsTextStyle,
-                                  ),
-                                  Text(
-                                    weatherStatus
-                                        .getWeatherIcon(data?.cod ?? 0),
-                                    style: kConditionTextStyle,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            "Seems like there's",
-                          ),
-                          Text(
-                            "${data?.weather[0].description.toString()}",
-                            style: kFeelsTextStyle,
-                          )
-                        ],
-                      ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  "Feels like",
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                                Text(
+                                  "${data?.main.feelsLike.toInt().toString()}°C",
+                                  style: kFeelsTextStyle,
+                                ),
+                                Text(
+                                  weatherStatus.getWeatherIcon(data?.cod ?? 0),
+                                  style: kConditionTextStyle,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Text(
+                          "Seems like there's",
+                        ),
+                        Text(
+                          "${data?.weather[0].description.toString()}",
+                          style: kFeelsTextStyle,
+                        ),
+                      ],
                     ),
                     Card(
                       color: Color.fromARGB(100, 53, 53, 53),
@@ -270,6 +296,68 @@ class _LocationScreenState extends State<LocationScreen> {
           );
         },
       ),
+    );
+  }
+}
+
+class RotateIcon extends StatefulWidget {
+  const RotateIcon({Key? key}) : super(key: key);
+
+  @override
+  _RotateIconState createState() => _RotateIconState();
+}
+
+class _RotateIconState extends State<RotateIcon>
+    with SingleTickerProviderStateMixin {
+  final controller = Get.put(WeatherController());
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+  bool toggle = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      reverseDuration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _animation = Tween(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextButton(
+          onPressed: () {
+            setState(() {
+              controller.getWeatherData();
+              if (_controller.isDismissed) {
+                _controller.forward();
+              } else {
+                _controller.reverse();
+              }
+              toggle = !toggle;
+              //print(toggle);
+            });
+          },
+          child: RotationTransition(
+            turns: _animation,
+            child: const Icon(
+              Icons.cached,
+              size: 35,
+            ),
+          ),
+        )
+      ],
     );
   }
 }
