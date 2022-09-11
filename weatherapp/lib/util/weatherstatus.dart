@@ -25,11 +25,11 @@ class WeatherStatus {
     } else if (temp > 20) {
       return 'SummerTime 😎';
     } else if (temp <= 20 && temp > 10) {
-      return 'Maybe consider\n wearing a jacket';
+      return 'Maybe consider wearing a 🧥';
     } else if (temp <= 10) {
       return 'It\'s too damn chilly.\n🧣 & 🧤 time';
     } else {
-      return 'Bring a 🧥 just in case';
+      return 'Oopsie, error in temperature info 😅';
     }
   }
 }

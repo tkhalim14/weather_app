@@ -5,7 +5,7 @@ import 'logger.dart';
 
 class BaseService {
   final Dio _dio = Dio(BaseOptions(
-      baseUrl: "https://samples.openweathermap.org",
+      baseUrl: "https://samples.openwenathermap.org",
       validateStatus: (status) {
         return status! < 500;
       },
@@ -26,7 +26,7 @@ class BaseService {
         options: Options(
             method: method,
             headers:
-                token != null ? {'authorization': 'Bearer $token'} : null));
+                token == null ? null : {'authorization': 'Bearer $token'}));
     return res;
   }
 }

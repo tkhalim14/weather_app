@@ -8,6 +8,7 @@ class WeatherController extends GetxController {
 
   Future<Weather> getWeatherData() async {
     // ignore: prefer_typing_uninitialized_variables
+    // print("Fetch Data");
     var res;
     try {
       res = await weatherService.getWeather();
