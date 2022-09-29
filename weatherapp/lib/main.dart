@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'My Weather App',
       theme: ThemeData(
         primarySwatch: Colors.red,
+        primaryColor: Colors.red,
         primaryIconTheme: const IconThemeData(
           color: Colors.red,
         ),
