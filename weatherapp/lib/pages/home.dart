@@ -131,17 +131,17 @@ class _LocationScreenState extends State<LocationScreen> {
             var data = snapshot.data;
             // var weatherIcon = weatherStatus.getWeatherIcon(data!.cod);
             weather_details = data?.weather[0].description.toString() ?? "";
-            return Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: background,
-                  fit: BoxFit.cover,
-                  colorFilter:
-                      ColorFilter.mode(Colors.white, BlendMode.dstATop),
+            return SafeArea(
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: background,
+                    fit: BoxFit.cover,
+                    colorFilter:
+                        ColorFilter.mode(Colors.white, BlendMode.dstATop),
+                  ),
                 ),
-              ),
-              constraints: BoxConstraints.expand(),
-              child: SafeArea(
+                constraints: BoxConstraints.expand(),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -265,7 +265,7 @@ class _LocationScreenState extends State<LocationScreen> {
       ),
       endDrawer: Drawer(
         child: appdrawer(),
-        semanticLabel: 'Wow',
+        backgroundColor: Color.fromARGB(255, 0, 0, 0),
         width: 250,
       ),
     );
@@ -279,23 +279,23 @@ class TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.blueAccent,
+        color: Colors.black,
         border: Border.all(
           color: Colors.black,
-          width: 2,
+          width: 1,
         ),
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
         gradient: LinearGradient(
           colors: [
-            Colors.black.withOpacity(0.75),
-            Colors.black.withOpacity(0.75),
+            Colors.black12.withOpacity(1),
+            Colors.black.withOpacity(1),
           ],
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey,
+            color: Colors.grey.shade800,
             blurRadius: 2.0,
-            offset: Offset(2.0, 2.0),
+            offset: Offset(0.0, 0.0),
           ),
         ],
       ),
@@ -309,6 +309,7 @@ class TopBar extends StatelessWidget {
             },
             child: const Icon(
               Icons.list,
+              color: Color.fromARGB(255, 207, 207, 207),
               size: 40.0,
             ),
           ),
@@ -375,7 +376,7 @@ class appdrawer extends StatelessWidget {
             ],
           ),
           decoration: BoxDecoration(
-            color: Colors.blue,
+            color: Colors.grey,
           ),
         ),
         Container(
