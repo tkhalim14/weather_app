@@ -21,12 +21,13 @@ class _LocationScreenState extends State<LocationScreen> {
 
   final weatherStatus = Get.put(WeatherStatus());
 
-  late String weather_details = "";
+  static String weather_details = "";
 
   AssetImage decideBackground(var hour, var weather_details) {
     int h = int.parse(hour);
+    // print(weather_details == 'mist');
     if (h > 18 || (h >= 0 && h < 5)) {
-      if (weather_details.split(" ")[1] == 'rain') {
+      if (weather_details == 'rain') {
         keyval = 'rainy_night';
       } else {
         keyval = 'night';
@@ -34,7 +35,7 @@ class _LocationScreenState extends State<LocationScreen> {
     } else if (h == 18) {
       keyval = 'sunset';
     } else if (h < 18 && h >= 12) {
-      if (weather_details.split(" ")[1] == 'rain') {
+      if (weather_details == 'rain') {
         keyval = 'rainy_day';
       } else {
         keyval = 'day';
@@ -42,7 +43,7 @@ class _LocationScreenState extends State<LocationScreen> {
     } else if (h == 5) {
       keyval = 'sunrise';
     } else if (h > 5 && h <= 11) {
-      if (weather_details.split(" ")[1] == 'rain') {
+      if (weather_details == 'rain') {
         keyval = 'rainy_day';
       } else {
         keyval = 'morning';
@@ -117,10 +118,8 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //print(weather_details);
     return Scaffold(
-      endDrawer: Drawer(
-        width: 250,
-      ),
       body: FutureBuilder<Weather>(
         future: controller.getWeatherData(),
         builder: (context, snapshot) {
@@ -147,21 +146,7 @@ class _LocationScreenState extends State<LocationScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        RotateIcon(),
-                        TextButton(
-                          onPressed: () {
-                            Scaffold.of(context).openEndDrawer();
-                          },
-                          child: const Icon(
-                            Icons.location_city,
-                            size: 35.0,
-                          ),
-                        ),
-                      ],
-                    ),
+                    TopBar(),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 90.0),
                       child: Column(
@@ -278,6 +263,142 @@ class _LocationScreenState extends State<LocationScreen> {
           }
         },
       ),
+      endDrawer: Drawer(
+        child: appdrawer(),
+        semanticLabel: 'Wow',
+        width: 250,
+      ),
+    );
+  }
+}
+
+class TopBar extends StatelessWidget {
+  const TopBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.blueAccent,
+        border: Border.all(
+          color: Colors.black,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(10.0),
+        gradient: LinearGradient(
+          colors: [
+            Colors.black.withOpacity(0.75),
+            Colors.black.withOpacity(0.75),
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey,
+            blurRadius: 2.0,
+            offset: Offset(2.0, 2.0),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          const RotateIcon(),
+          TextButton(
+            onPressed: () {
+              Scaffold.of(context).openEndDrawer();
+            },
+            child: const Icon(
+              Icons.list,
+              size: 40.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class appdrawer extends StatelessWidget {
+  appdrawer({Key? key}) : super(key: key);
+
+  var suggestions = {
+    'rain': [
+      'Play a board game!',
+      'Have a family movie night.',
+      'Get crafty!',
+      'Make a pillow fort.',
+      'Bake a cake!',
+    ],
+    'sunny': [
+      'Go to a park',
+      'Have a picnic',
+      'Go for a hike',
+      'Ride a Bike',
+      'Go Fly a Kite. No, Really.',
+    ],
+    'cloud': [
+      'Make a list',
+      'Exercise',
+      'Meet up with a friend',
+      'Go skating',
+      'Perfect time for Netflix'
+    ],
+    'mist': [
+      'Draw smileys on foggy windows',
+      'Read',
+      'Scare people',
+      'Roleplay',
+      'Pretend you are Snoop Dogg'
+    ],
+    'haze': [
+      'Stay Indoors',
+      'Read',
+      'Keep yourself hydrated',
+      'Perfect time for cold beverages',
+      'Wear shades 😎'
+    ]
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    //print(_LocationScreenState.weather_details);
+    return ListView(
+      children: <Widget>[
+        DrawerHeader(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Suggestions :',
+                style: TextStyle(fontSize: 30.0, color: Colors.white),
+              ),
+            ],
+          ),
+          decoration: BoxDecoration(
+            color: Colors.blue,
+          ),
+        ),
+        Container(
+          height: double.maxFinite,
+          child: ListView.builder(
+            itemCount:
+                suggestions[_LocationScreenState.weather_details]?.length ?? 0,
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                title: Text(suggestions[_LocationScreenState.weather_details]
+                        ?.elementAt(index) ??
+                    'No suggesion available'),
+                onTap: () {
+                  // Update the state of the app
+                  // ...
+                  // Then close the drawer
+                  Navigator.pop(context);
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

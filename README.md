@@ -1,6 +1,8 @@
 # weatherapp
 
-A new Flutter project.
+My Weather App project.
+
+This App calls an API to display on the screen, Added extra features like refresh and Wallpaper Cascading according to the weather and time of day.
 
 ## Getting Started
 

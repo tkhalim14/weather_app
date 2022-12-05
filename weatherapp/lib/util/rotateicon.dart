@@ -58,7 +58,7 @@ class _RotateIconState extends State<RotateIcon>
             turns: _animation,
             child: const Icon(
               Icons.cached,
-              size: 35,
+              size: 40,
             ),
           ),
         )
