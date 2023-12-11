@@ -5,6 +5,7 @@ import 'package:weatherapp/controller/weather_controller.dart';
 import 'package:weatherapp/models/model.dart';
 import 'package:weatherapp/util/constants.dart';
 import 'package:weatherapp/util/weatherstatus.dart';
+import 'package:weatherapp/util/snackbar.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:weatherapp/util/rotateicon.dart';
@@ -12,6 +13,9 @@ import 'package:flutter/services.dart';
 import 'package:weatherapp/util/wallpaper_constants.dart';
 
 class LocationScreen extends StatefulWidget {
+
+  const LocationScreen({Key? key}) : super(key: key);
+
   @override
   State<LocationScreen> createState() => _LocationScreenState();
 }
@@ -102,7 +106,14 @@ class _LocationScreenState extends State<LocationScreen> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    Timer.periodic(const Duration(seconds: 1), (Timer t) => {_getTime()});
+    Timer.periodic(const Duration(seconds: 30), (Timer t) => {_getTime()});
+  }
+
+  void onRefreshButtonPressed() {
+    // Implement any logic to refresh location data
+    setState(() {
+      print('Refreshing....');
+    });
   }
 
   @override
@@ -118,162 +129,169 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //print(weather_details);
-    return Scaffold(
-      body: FutureBuilder<Weather>(
-        future: controller.getWeatherData(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(snapshot.error.toString()),
+    // print(weather_details);
+    return FutureBuilder<Weather>(
+      future: controller.getWeatherData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          // _showSnackbar(snapshot.error.toString());
+          return Center(
+              // child: Text(snapshot.error.toString()),
+              child: Text("Oops! Something went wrong."),
             );
-          } else if (snapshot.hasData) {
-            var data = snapshot.data;
-            // var weatherIcon = weatherStatus.getWeatherIcon(data!.cod);
-            weather_details = data?.weather[0].description.toString() ?? "";
-            return SafeArea(
-              child: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: background,
-                    fit: BoxFit.cover,
-                    colorFilter:
-                        ColorFilter.mode(Colors.white, BlendMode.dstATop),
-                  ),
-                ),
-                constraints: BoxConstraints.expand(),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    TopBar(),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 90.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            '${_timeString.split('\n')[1].split(' ')[1]}',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 70,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            '${_timeString.split('\n')[0]}',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 100,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "${data?.main.temp.toInt()}°C",
-                                    style: kTempTextStyle,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Column(
-                                children: [
-                                  const Text(
-                                    "Feels like",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    "${data?.main.feelsLike.toInt()}°C",
-                                    style: kFeelsTextStyle,
-                                  ),
-                                  Text(
-                                    weatherStatus
-                                        .getWeatherIcon(data?.cod ?? 0),
-                                    style: kConditionTextStyle,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Text(
-                            "Seems like there's",
-                          ),
-                          Text(
-                            "${data?.weather[0].description.toString()}",
-                            style: kFeelsTextStyle,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Card(
-                      color: Color.fromARGB(54, 53, 53, 53),
-                      clipBehavior: Clip.antiAlias,
-                      child: Container(
-                        child: Text(
-                          "${weatherStatus.getMessage(data?.main.temp.toInt() ?? 0)}\n in ${data?.name ?? "unknown"}",
-                          textAlign: TextAlign.center,
-                          style: kMessageTextStyle,
-                        ),
-                      ),
-                    ),
-                  ],
+        } else if (snapshot.hasData) {
+          var data = snapshot.data;
+          // print(data);
+          // var weatherIcon = weatherStatus.getWeatherIcon(data!.cod);
+          weather_details = data?.weather[0].description.toString() ?? "";
+          return SafeArea(
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: background,
+                  fit: BoxFit.cover,
+                  colorFilter:
+                      ColorFilter.mode(Colors.white, BlendMode.dstATop),
                 ),
               ),
-            );
-          } else {
-            return Stack(
-              alignment: AlignmentDirectional.center,
-              children: [
-                new Positioned(
-                  right: 98,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.arrow_back_ios,
-                        size: 90,
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 90,
-                      ),
-                    ],
+              constraints: BoxConstraints.expand(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  TopBar(onRefreshButtonPressed: onRefreshButtonPressed),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 90.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          '${_timeString.split('\n')[1].split(' ')[1]}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 70,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '${_timeString.split('\n')[0]}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 100,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${data?.main.temp.toInt()}°C",
+                                  style: kTempTextStyle,
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Column(
+                              children: [
+                                const Text(
+                                  "Feels like",
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                                Text(
+                                  "${data?.main.feelsLike.toInt()}°C",
+                                  style: kFeelsTextStyle,
+                                ),
+                                Text(
+                                  weatherStatus.getWeatherIcon(data?.cod ?? 0),
+                                  style: kConditionTextStyle,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Text(
+                          "Seems like there's",
+                        ),
+                        Text(
+                          "${data?.weather[0].description.toString()}",
+                          style: kFeelsTextStyle,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                new Positioned(
-                  child: SpinKitFadingCube(
-                    color: Colors.white,
-                    size: 45.0,
+                  Card(
+                    color: Color.fromARGB(54, 53, 53, 53),
+                    clipBehavior: Clip.antiAlias,
+                    child: Container(
+                      child: Text(
+                        "${weatherStatus.getMessage(data?.main.temp.toInt() ?? 0)}\n in ${data?.name ?? "unknown"}",
+                        textAlign: TextAlign.center,
+                        style: kMessageTextStyle,
+                      ),
+                    ),
                   ),
-                )
-              ],
-            );
-          }
-        },
-      ),
-      endDrawer: Drawer(
-        child: appdrawer(),
-        backgroundColor: Color.fromARGB(255, 0, 0, 0),
-        width: 250,
-      ),
+                ],
+              ),
+            ),
+          );
+        } else {
+          return loadingscreen();
+        }
+      },
+    );
+  }
+}
+
+class loadingscreen extends StatelessWidget {
+  const loadingscreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: AlignmentDirectional.center,
+      children: [
+        new Positioned(
+          right: 98,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.arrow_back_ios,
+                size: 90,
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 90,
+              ),
+            ],
+          ),
+        ),
+        new Positioned(
+          child: SpinKitFadingCube(
+            color: Colors.white,
+            size: 45.0,
+          ),
+        )
+      ],
     );
   }
 }
 
 class TopBar extends StatelessWidget {
-  const TopBar({Key? key}) : super(key: key);
+  final VoidCallback onRefreshButtonPressed;
+
+  const TopBar({Key? key, required this.onRefreshButtonPressed})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -302,7 +320,7 @@ class TopBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          const RotateIcon(),
+          RotateIcon(onPressed: onRefreshButtonPressed),
           TextButton(
             onPressed: () {
               Scaffold.of(context).openEndDrawer();
@@ -357,12 +375,22 @@ class appdrawer extends StatelessWidget {
       'Keep yourself hydrated',
       'Perfect time for cold beverages',
       'Wear shades 😎'
-    ]
+    ],
+    'default': [
+      'No suggestions available.',
+      "Don't forget to smile.",
+    ],
   };
 
   @override
   Widget build(BuildContext context) {
     //print(_LocationScreenState.weather_details);
+    final suggestion;
+    if (suggestions.containsKey(_LocationScreenState.weather_details)) {
+      suggestion = (suggestions[_LocationScreenState.weather_details]);
+    } else {
+      suggestion = (suggestions['default']);
+    }
     return ListView(
       children: <Widget>[
         DrawerHeader(
@@ -382,13 +410,13 @@ class appdrawer extends StatelessWidget {
         Container(
           height: double.maxFinite,
           child: ListView.builder(
-            itemCount:
-                suggestions[_LocationScreenState.weather_details]?.length ?? 0,
+            itemCount: suggestion?.length ?? 0,
             itemBuilder: (BuildContext context, int index) {
               return ListTile(
-                title: Text(suggestions[_LocationScreenState.weather_details]
-                        ?.elementAt(index) ??
-                    'No suggesion available'),
+                title: Text(
+                  suggestion?.elementAt(index) ?? 'No suggesion available',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onTap: () {
                   // Update the state of the app
                   // ...

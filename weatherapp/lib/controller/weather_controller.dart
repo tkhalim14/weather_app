@@ -13,7 +13,7 @@ class WeatherController extends GetxController {
     try {
       res = await weatherService.getWeather();
       if (res.statusCode != 200 || res.statusCode != 201) {
-        return WeatherSnackBars.errorSnackBar(message: res.data['message']);
+        WeatherSnackBars.errorSnackBar(message: res.data['message']);
       } else {}
     } catch (e) {
       WeatherSnackBars.errorSnackBar(message: e.toString());

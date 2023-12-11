@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:weatherapp/controller/weather_controller.dart';
+import 'package:weatherapp/pages/home.dart';
 
 class RotateIcon extends StatefulWidget {
-  const RotateIcon({Key? key}) : super(key: key);
+  final VoidCallback onPressed;
+
+  const RotateIcon({Key? key, required this.onPressed}) : super(key: key);
 
   @override
   _RotateIconState createState() => _RotateIconState();
@@ -37,6 +40,7 @@ class _RotateIconState extends State<RotateIcon>
   void dispose() {
     super.dispose();
     _controller.dispose();
+
   }
 
   @override
@@ -45,14 +49,10 @@ class _RotateIconState extends State<RotateIcon>
       children: [
         TextButton(
           onPressed: () {
-            controller.getWeatherData();
+            widget.onPressed();
             if (_controller.isDismissed) {
               _controller.forward();
             }
-            // //toggle = !toggle;
-            // //print(toggle);
-            // //if (toggle == true) {
-            //}
           },
           child: RotationTransition(
             turns: _animation,

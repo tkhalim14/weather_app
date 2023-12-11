@@ -10,13 +10,13 @@ class WeatherSnackBars {
       message: message,
       messageText: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
             width: Get.width / 1.6,
             child: Text(
               message,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.red),
             ),
           ),
           const Icon(
@@ -32,7 +32,7 @@ class WeatherSnackBars {
         Icons.cancel,
         color: Colors.white,
       ),
-      isDismissible: false,
+      isDismissible: true,
       backgroundColor: Colors.red,
     );
   }
