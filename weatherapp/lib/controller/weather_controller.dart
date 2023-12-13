@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:get/get.dart';
 import 'package:weatherapp/models/model.dart';
 import 'package:weatherapp/services/weather_service.dart';
@@ -12,6 +14,23 @@ class WeatherController extends GetxController {
     var res;
     try {
       res = await weatherService.getWeather();
+      if (res.statusCode != 200 || res.statusCode != 201) {
+        WeatherSnackBars.errorSnackBar(message: res.data['message']);
+      } else {}
+    } catch (e) {
+      WeatherSnackBars.errorSnackBar(message: e.toString());
+    }
+    return Weather.fromJson(res.data);
+  }
+
+  Future<Weather> getWeatherDataFromLatitudeAndLongitude(
+      double latitude, double longitude) async {
+    // ignore: prefer_typing_uninitialized_variables
+    // print("Fetch Data");
+    var res;
+    try {
+      res = await weatherService.getWeatherFromLatitudeAndLongitude(
+          latitude, longitude);
       if (res.statusCode != 200 || res.statusCode != 201) {
         WeatherSnackBars.errorSnackBar(message: res.data['message']);
       } else {}

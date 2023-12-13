@@ -5,7 +5,7 @@ import 'package:weatherapp/controller/weather_controller.dart';
 import 'package:weatherapp/models/model.dart';
 import 'package:weatherapp/util/constants.dart';
 import 'package:weatherapp/util/weatherstatus.dart';
-import 'package:weatherapp/util/snackbar.dart';
+// import 'package:weatherapp/util/snackbar.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:weatherapp/util/rotateicon.dart';
@@ -13,7 +13,6 @@ import 'package:flutter/services.dart';
 import 'package:weatherapp/util/wallpaper_constants.dart';
 
 class LocationScreen extends StatefulWidget {
-
   const LocationScreen({Key? key}) : super(key: key);
 
   @override
@@ -102,10 +101,6 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
     Timer.periodic(const Duration(seconds: 30), (Timer t) => {_getTime()});
   }
 
@@ -118,12 +113,6 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   dispose() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
     super.dispose();
   }
 
@@ -136,9 +125,9 @@ class _LocationScreenState extends State<LocationScreen> {
         if (snapshot.hasError) {
           // _showSnackbar(snapshot.error.toString());
           return Center(
-              // child: Text(snapshot.error.toString()),
-              child: Text("Oops! Something went wrong."),
-            );
+            // child: Text(snapshot.error.toString()),
+            child: Text("Oops! Something went wrong."),
+          );
         } else if (snapshot.hasData) {
           var data = snapshot.data;
           // print(data);
@@ -375,6 +364,13 @@ class appdrawer extends StatelessWidget {
       'Keep yourself hydrated',
       'Perfect time for cold beverages',
       'Wear shades 😎'
+    ],
+    'clear sky': [
+      'Make a list',
+      'Exercise',
+      'Meet up with a friend',
+      'Go skating',
+      'Perfect time for Netflix'
     ],
     'default': [
       'No suggestions available.',
